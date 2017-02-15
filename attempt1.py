@@ -34,9 +34,24 @@ def get_top_cluster(k):
     return np.ndarray.tolist(sorted_clust[-k:,0])
 
 def get_top_degree(k):
-    degree_dict = G.degree(G.nodes())
+    degree_dict = G.degree(G)
     sorted_degree_dict = np.array( sorted(degree_dict.items(), key = itemgetter(1)  ), dtype = str)
     return np.ndarray.tolist(sorted_degree_dict[-k:, 0])
+
+def get_top_katz(k):
+    katz_dict = nx.katz_centrality(G, 0.02)
+    sorted_katz_dict = np.array( sorted(katz_dict.items(), key = itemgetter(1)  ), dtype = str)
+    return np.ndarray.tolist(sorted_katz_dict[-k:, 0])
+
+def get_centrality_sum(k):
+    dg_centrality_dict = nx.degree_centrality(G)
+    cl_centrality_dict = nx.closeness_centrality(G)
+    bw_centrality_dict = nx.betweenness_centrality(G)
+    centrality_dict = {}
+    for key in bw_centrality_dict.keys():
+        centrality_dict[key] = dg_centrality_dict[key] + cl_centrality_dict[key] + bw_centrality_dict[key]
+    sorted_centrality_dict = np.array( sorted(centrality_dict.items(), key = itemgetter(1)  ), dtype = str)
+    return np.ndarray.tolist(sorted_centrality_dict[-k:, 0])
 
 def run_strategy(k, strat_name):
     if strat_name == 'random':
@@ -45,8 +60,14 @@ def run_strategy(k, strat_name):
         return get_top_cluster(k)
     elif strat_name == 'degree':
         return get_top_degree(k)
+    elif strat_name == 'katz_central':
+        return get_top_katz(k)
+    elif strat_name == 'centrality':
+        return get_centrality_sum(k)
     else:
         return []
+
+
 
 #######################
 # Simulation Handling #
@@ -63,7 +84,28 @@ def run_simulation(k, strat_name):
         nodes[name] = run_strategy(k, strat_name[name])
     print(sim.run(data, nodes))
 
-run_simulation(5, {'strat1': 'degree', 'strat2': 'random'})
+def run_multiple_simulations(num_simulations, k, strat_name):
+
+    print len(strat_name)
+    print strat_name
+    win_dict = {}
+
+    for i in range(num_simulations):
+        nodes = {}
+        for name in list(strat_name.keys()):
+            nodes[name] = run_strategy(k, strat_name[name])
+
+        sim_results = sim.run(data, nodes)
+        max_key = max(sim_results.iteritems(), key=operator.itemgetter(1))[0]
+
+        if strat_name[max_key] not in win_dict:
+            win_dict[strat_name[max_key]] = 1
+        else:
+            win_dict[strat_name[max_key]] += 1
+
+    return win_dict
+
+print run_multiple_simulations(50, 5, {'strat1': 'degree', 'strat2': 'cluster', 'strat3': 'random', 'strat4': 'centrality' })
 
 def print_out(choices, outfile_path):
     f = open(outfile_path, 'w')
