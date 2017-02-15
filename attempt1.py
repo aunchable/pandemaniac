@@ -2,7 +2,11 @@ import json
 import networkx as nx
 import numpy as np
 import sim
+import operator
 
+############################################
+# Load graph and convert to networkx graph #
+############################################
 with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -16,25 +20,40 @@ for i in range(num_nodes):
 
 G = nx.from_numpy_matrix(adj)
 
-
+####################
+# Strategy Section #
+####################
 def get_random(k):
     nodes = [str(i) for i in list(data.keys())]
     return np.ndarray.tolist(np.random.choice(nodes, k))
 
+def get_top_cluster(k):
+    clust_dict = nx.clustering(G)
+    sorted_clust = np.array(sorted(clust_dict.items(), key=operator.itemgetter(1)), dtype=str)
+    return np.ndarray.tolist(sorted_clust[-k:,0])
 
+def run_strategy(k, strat_name):
+    if strat_name == 'random':
+        return get_random(k)
+    elif strat_name == 'cluster':
+        return get_top_cluster(k)
+    else
+        return []
+
+#######################
+# Simulation Handling #
+#######################
 def repeat_strategy(k, num_iters, strat_name):
     choices = []
-    if strat_name == 'random':
-        for i in range(num_iters):
-            choices.append(get_random(k))
+    for i in range(num_iters):
+        choices.append(run_strategy(k, strat_name))
     return choices
 
 
-def run_simulation(k, name_strat):
+def run_simulation(k, strat_name):
     nodes = {}
-    for name in list(name_strat.keys()):
-        if name_strat[name] == 'random':
-            nodes[name] = get_random(k)
+    for name in list(strat_name.keys()):
+        nodes[name] = run_strategy(k, strat_name)
     print(sim.run(data, nodes))
 
 # run_simulation(5, {'strat1': 'random', 'strat2': 'random'})
