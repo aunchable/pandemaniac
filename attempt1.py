@@ -2,8 +2,8 @@ import json
 import networkx as nx
 import numpy as np
 import sim
-import operator
 from operator import itemgetter
+import time
 
 ############################################
 # Load graph and convert to networkx graph #
@@ -30,7 +30,7 @@ def get_random(k):
 
 def get_top_cluster(k):
     clust_dict = nx.clustering(G)
-    sorted_clust = np.array(sorted(clust_dict.items(), key=operator.itemgetter(1)), dtype=str)
+    sorted_clust = np.array(sorted(clust_dict.items(), key=itemgetter(1)), dtype=str)
     return np.ndarray.tolist(sorted_clust[-k:,0])
 
 def get_top_degree(k):
@@ -85,27 +85,39 @@ def run_simulation(k, strat_name):
     print(sim.run(data, nodes))
 
 def run_multiple_simulations(num_simulations, k, strat_name):
-
-    print len(strat_name)
-    print strat_name
     win_dict = {}
 
+    times = {}
+    nodes = {}
+    for name in list(strat_name.keys()):
+        times[name] = []
+
+    quads = 0
     for i in range(num_simulations):
-        nodes = {}
+        while i >= (quads+1) * (num_simulations / 4.0):
+            quads += 1
+            print ("Done with ~{0}% of simulations ({1} / {2})...".format(quads*25, i, num_simulations))
+
         for name in list(strat_name.keys()):
+            start = time.clock()
             nodes[name] = run_strategy(k, strat_name[name])
+            times[name] = time.clock() - start
 
         sim_results = sim.run(data, nodes)
-        max_key = max(sim_results.iteritems(), key=operator.itemgetter(1))[0]
+        max_key = max(sim_results.iteritems(), key=itemgetter(1))[0]
 
         if strat_name[max_key] not in win_dict:
             win_dict[strat_name[max_key]] = 1
         else:
             win_dict[strat_name[max_key]] += 1
 
-    return win_dict
+    avg_times = {}
+    for name in times:
+        avg_times[name] = np.mean(times[name])
 
-print run_multiple_simulations(50, 5, {'strat1': 'degree', 'strat2': 'cluster', 'strat3': 'random', 'strat4': 'centrality' })
+    return win_dict, avg_times
+
+print run_multiple_simulations(50, 5, {'strat1': 'degree', 'strat2': 'cluster', 'strat3': 'katz_central', 'strat4': 'centrality'})
 
 def print_out(choices, outfile_path):
     f = open(outfile_path, 'w')
