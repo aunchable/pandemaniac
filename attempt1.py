@@ -8,7 +8,8 @@ import time
 ############################################
 # Load graph and convert to networkx graph #
 ############################################
-with open('./testgraph1.json') as data_file:
+with open('/Users/anshulramachandran/Downloads/8.35.1.json') as data_file:
+# with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
 num_nodes = len(data)
@@ -78,6 +79,10 @@ def repeat_strategy(k, num_iters, strat_name):
         choices.append(run_strategy(k, strat_name))
     return choices
 
+def repeat_same_strategy(k, num_iters, strat_name):
+    choices = [run_strategy(k, strat_name)] * 50
+    return choices
+
 def run_simulation(k, strat_name):
     nodes = {}
     for name in list(strat_name.keys()):
@@ -117,10 +122,13 @@ def run_multiple_simulations(num_simulations, k, strat_name):
 
     return win_dict, avg_times
 
-print run_multiple_simulations(50, 5, {'strat1': 'degree', 'strat2': 'cluster', 'strat3': 'katz_central', 'strat4': 'centrality'})
+# print run_multiple_simulations(50, 5, {'strat1': 'degree', 'strat2': 'cluster', 'strat3': 'katz_central', 'strat4': 'centrality'})
 
 def print_out(choices, outfile_path):
     f = open(outfile_path, 'w')
     for iter_choices in choices:
         for node in iter_choices:
             f.write(str(node) + '\n')
+
+choices = repeat_same_strategy(35, 50, 'centrality')
+print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.1.2.txt')
