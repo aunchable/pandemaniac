@@ -4,11 +4,13 @@ import numpy as np
 import sim
 from operator import itemgetter
 import time
+from random import choice
 
 ############################################
 # Load graph and convert to networkx graph #
 ############################################
-with open('/Users/anshulramachandran/Downloads/8.35.1.json') as data_file:
+alpha = 1
+with open('graphs/8.35.1.json') as data_file:
 # with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -21,6 +23,39 @@ for i in range(num_nodes):
         adj[i][int(neighbor)] = 1
 
 G = nx.from_numpy_matrix(adj)
+
+G1 = G.copy()
+old_len = -1
+while len(G1.nodes()) != old_len:
+    old_len = len(G1.nodes())
+    deg = G1.degree()
+    to_remove = [n for n in deg if deg[n] <= 20]
+    G1.remove_nodes_from(to_remove)
+    print old_len  
+subGs = [G1.subgraph(c) for c in sorted(nx.connected_components(G1), key=len, reverse=True) ]
+print [len(n) for n in subGs]
+
+# bw_centrality_dict = nx.betweenness_centrality(G1)
+# # dg_centrality_dict = nx.degree_centrality(G1)
+
+# ranking = {}
+# for key in bw_centrality_dict.keys():
+#     ranking[key] = alpha * bw_centrality_dict[key]
+# print ranking
+# ranking = np.array(sorted(ranking.items(), key=itemgetter(1)))
+# drop = np.ndarray.tolist(ranking[-200:, 0])
+# print drop
+# G1.remove_nodes_from(drop)
+# print len(G1)
+# subGs = [G1.subgraph(c) for c in sorted(nx.connected_components(G1), key=len, reverse=True) ]
+# print [len(n) for n in subGs]
+
+
+# while G1.is_connected():
+#     G1.remove_node(drop[0])
+#     drop = drop[1:]
+
+
 
 ####################
 # Strategy Section #
@@ -130,5 +165,5 @@ def print_out(choices, outfile_path):
         for node in iter_choices:
             f.write(str(node) + '\n')
 
-choices = repeat_same_strategy(35, 50, 'centrality')
-print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.1.2.txt')
+# choices = repeat_same_strategy(35, 50, 'centrality')
+# print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.1.2.txt')
