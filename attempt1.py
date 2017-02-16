@@ -4,13 +4,12 @@ import numpy as np
 import sim
 from operator import itemgetter
 import time
-from random import choice
+import matplotlib.pyplot as plt
 
 ############################################
 # Load graph and convert to networkx graph #
 ############################################
-alpha = 1
-with open('graphs/8.35.1.json') as data_file:
+with open('graphs/4.10.1.json') as data_file:
 # with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -23,40 +22,46 @@ for i in range(num_nodes):
         adj[i][int(neighbor)] = 1
 
 G = nx.from_numpy_matrix(adj)
+# G=nx.dodecahedral_graph()
+pos = nx.spring_layout(G)
+nx.draw(G)
+plt.show()
 
 G1 = G.copy()
 old_len = -1
 while len(G1.nodes()) != old_len:
     old_len = len(G1.nodes())
     deg = G1.degree()
-    to_remove = [n for n in deg if deg[n] <= 20]
+    to_remove = [n for n in deg if deg[n] <= 10]
     G1.remove_nodes_from(to_remove)
-    print old_len  
-subGs = [G1.subgraph(c) for c in sorted(nx.connected_components(G1), key=len, reverse=True) ]
-print [len(n) for n in subGs]
+    print old_len
+nx.draw_networkx_nodes(G1, pos)
+nx.draw_networkx_edges(G1, pos)
+plt.show()
 
-# bw_centrality_dict = nx.betweenness_centrality(G1)
-# # dg_centrality_dict = nx.degree_centrality(G1)
-
-# ranking = {}
-# for key in bw_centrality_dict.keys():
-#     ranking[key] = alpha * bw_centrality_dict[key]
-# print ranking
-# ranking = np.array(sorted(ranking.items(), key=itemgetter(1)))
-# drop = np.ndarray.tolist(ranking[-200:, 0])
-# print drop
+bw_centrality_dict = nx.betweenness_centrality(G1)
+# dg_centrality_dict = nx.degree_centrality(G1)
+alpha =1
+ranking = {}
+for key in bw_centrality_dict.keys():
+    ranking[key] = alpha * bw_centrality_dict[key]
+print ranking
+ranking = np.array(sorted(ranking.items(), key=itemgetter(1)))
+drop = np.ndarray.tolist(ranking[:, 0])
+while nx.is_connected(G1):
+    print(len(G1.nodes()))
+    if (drop[-1] in G1.nodes()):
+        G1.remove_node(drop[-1])
+    drop = drop[:-1]
+    deg = G1.degree()
+    to_remove = [n for n in deg if deg[n] <= 1]
+    G1.remove_nodes_from(to_remove)
 # G1.remove_nodes_from(drop)
-# print len(G1)
-# subGs = [G1.subgraph(c) for c in sorted(nx.connected_components(G1), key=len, reverse=True) ]
-# print [len(n) for n in subGs]
+print drop
 
-
-# while G1.is_connected():
-#     G1.remove_node(drop[0])
-#     drop = drop[1:]
-
-
-
+nx.draw_networkx_nodes(G1, pos)
+nx.draw_networkx_edges(G1, pos)
+plt.show()
 ####################
 # Strategy Section #
 ####################
