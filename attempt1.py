@@ -23,7 +23,33 @@ for i in range(num_nodes):
     for neighbor in data[str(i)]:
         adj[i][int(neighbor)] = 1
 
+# G = nx.from_numpy_matrix(adj)
 G = nx.from_numpy_matrix(adj)
+print len(G)
+# G=nx.dodecahedral_graph()
+pos = nx.spring_layout(G)
+# nx.draw(G)
+# plt.title("Original")
+# plt.show()
+
+G1 = G.copy()
+cut = 5
+while len(G1) > 200:
+    old_len = -1
+    while len(G1) != old_len:
+        old_len = len(G1)
+        deg = G1.degree()
+        to_remove = [n for n in deg if deg[n] <= cut]
+        G1.remove_nodes_from(to_remove)
+        if len(G1) < 200:
+            break
+    cut += 1
+
+# nx.draw(G1)
+# plt.show()
+
+subgraphs = [len(c) for c in nx.connected_components(G1)]
+# print subgraphs
 # # G=nx.dodecahedral_graph()
 # pos = nx.spring_layout(G)
 # #nx.draw(G)
