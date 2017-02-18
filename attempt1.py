@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # Load graph and convert to networkx graph #
 ############################################
 #with open('graphs/testgraph1.json') as data_file:
-with open('/Users/anshulramachandran/Downloads/8.35.2.json') as data_file:
+with open('/Users/abalakrishna/Downloads/2.10.32.json') as data_file:
 # with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -23,32 +23,52 @@ for i in range(num_nodes):
     for neighbor in data[str(i)]:
         adj[i][int(neighbor)] = 1
 
-# G = nx.from_numpy_matrix(adj)
-G = nx.from_numpy_matrix(adj)
-print len(G)
-# G=nx.dodecahedral_graph()
-pos = nx.spring_layout(G)
-# nx.draw(G)
-# plt.title("Original")
-# plt.show()
+G_initial = nx.from_numpy_matrix(adj)
+print len(G_initial)
+#plt.title("Original")
+#plt.show()
 
-G1 = G.copy()
-cut = 5
-while len(G1) > 200:
+# PRUNE G_initial to get G
+
+G = G_initial.copy()
+print len(G)
+cut = int(np.log(len(G)))
+print cut
+while len(G) > int(0.4*len(G_initial)):
     old_len = -1
-    while len(G1) != old_len:
-        old_len = len(G1)
-        deg = G1.degree()
+    while len(G) != old_len:
+        old_len = len(G)
+        deg = G.degree()
         to_remove = [n for n in deg if deg[n] <= cut]
-        G1.remove_nodes_from(to_remove)
-        if len(G1) < 200:
+        G.remove_nodes_from(to_remove)
+        if len(G) < int(0.4*len(G_initial)):
             break
     cut += 1
 
-# nx.draw(G1)
-# plt.show()
+# Function so that given K, uses subgraphs and centrality to
+# output choices
 
-subgraphs = [len(c) for c in nx.connected_components(G1)]
+#for node in s:
+#    choices.append((node, adj[node]) )
+
+#print choices
+
+# choices = []
+#
+# for i in range(len(choices)):
+#     choicesd
+
+#for i in range(len(choices))
+
+
+
+
+#for i in len(subgraphs):
+
+
+
+
+
 # print subgraphs
 # # G=nx.dodecahedral_graph()
 # pos = nx.spring_layout(G)
@@ -122,7 +142,7 @@ def get_centrality_sum(k):
     sorted_centrality_dict = np.array( sorted(centrality_dict.items(), key = itemgetter(1)  ), dtype = str)
     return np.ndarray.tolist(sorted_centrality_dict[-k:, 0])
 
-def get_centrality_sum_randomized_multiple(k, distr, num_iters):
+def get_centrality_sum_randomized_multiple(k, distr, num_iters, G):
     dg_centrality_dict = nx.degree_centrality(G)
     cl_centrality_dict = nx.closeness_centrality(G)
     bw_centrality_dict = nx.betweenness_centrality(G)
@@ -144,6 +164,30 @@ def get_centrality_sum_randomized_multiple(k, distr, num_iters):
         choices.append(topk[0:numtopk] + middle2k[0:nummiddle2k] + bottom3k[0:numbottom3k])
     return choices
 
+def getClusteredChoices(k, G, ratios, num_copies):
+
+    choices = []
+    subgraphs = [c for c in nx.connected_components(G)]
+
+    partition = int(k/len(subgraphs))
+    total = 0
+
+    for c in subgraphs:
+        H = G.subgraph(c)
+
+        if k - total  <=  2*partition:
+            a = get_centrality_sum_randomized_multiple(k - total, ratios, num_copies, H)
+            for i in range(len(a)):
+                choices.append(a[i])
+
+        else:
+            a = get_centrality_sum_randomized_multiple(partition, ratios,  num_copies, H)
+            for i in range(len(a)):
+                choices.append(a[i])
+
+        total += partition
+
+    return choices
 
 def run_strategy(k, strat_name):
     if strat_name == 'random':
@@ -158,8 +202,6 @@ def run_strategy(k, strat_name):
         return get_centrality_sum(k)
     else:
         return []
-
-
 
 #######################
 # Simulation Handling #
@@ -221,9 +263,13 @@ def print_out(choices, outfile_path):
         for node in iter_choices:
             f.write(str(node) + '\n')
 
-choices = repeat_strategy(35, 50, 'random')
-print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.2.1.txt')
+#choices = repeat_strategy(35, 50, 'random')
+#print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.2.1.txt')
 # choices = repeat_same_strategy(35, 50, 'centrality')
-choices = get_centrality_sum_randomized_multiple(35, [7,14,14], 50)
-#print_out(choices, './output1.txt')
-print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.2.2.txt')
+# choices = get_centrality_sum_randomized_multiple(10, [8, 2, 0], 1, G)
+choices = getClusteredChoices(10, G, [8, 2, 0], 1)
+
+print choices
+# print_out(choices, './output1.txt')
+#print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.2.2.txt')
+#print_out(choices, '/Users/abalakrishna/Downloads/submission2.10.32.1.txt')
