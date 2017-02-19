@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # Load graph and convert to networkx graph #
 ############################################
 #with open('graphs/testgraph1.json') as data_file:
-with open('/Users/abalakrishna/Downloads/2.10.32.json') as data_file:
+with open('graphs/8.35.2.json') as data_file:
 # with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -34,17 +34,17 @@ G = G_initial.copy()
 print len(G)
 cut = int(np.log(len(G)))
 print cut
-while len(G) > int(0.4*len(G_initial)):
+while len(G) > int(0.3*len(G_initial)):
     old_len = -1
     while len(G) != old_len:
         old_len = len(G)
         deg = G.degree()
         to_remove = [n for n in deg if deg[n] <= cut]
         G.remove_nodes_from(to_remove)
-        if len(G) < int(0.4*len(G_initial)):
+        if len(G) < int(0.3*len(G_initial)):
             break
     cut += 1
-
+print("Done pruning with {0} nodes left".format(len(G)))
 # Function so that given K, uses subgraphs and centrality to
 # output choices
 
@@ -143,12 +143,21 @@ def get_centrality_sum(k):
     return np.ndarray.tolist(sorted_centrality_dict[-k:, 0])
 
 def get_centrality_sum_randomized_multiple(k, distr, num_iters, G):
+    start = time.clock()
     dg_centrality_dict = nx.degree_centrality(G)
+    print("Degree Time: " + str(time.clock() - start))
     cl_centrality_dict = nx.closeness_centrality(G)
-    bw_centrality_dict = nx.betweenness_centrality(G)
+    print("Closeness Time: " + str(time.clock() - start))
+    if len(G) < 2000:
+        bw_centrality_dict = nx.betweenness_centrality(G)
+        print("Betweenness Time: " + str(time.clock() - start))
+
     centrality_dict = {}
-    for key in bw_centrality_dict.keys():
-        centrality_dict[key] = dg_centrality_dict[key] + cl_centrality_dict[key] + bw_centrality_dict[key]
+    for key in dg_centrality_dict.keys():
+        if len(G) >= 2000:
+            centrality_dict[key] = dg_centrality_dict[key] + cl_centrality_dict[key]
+        else:
+            centrality_dict[key] = dg_centrality_dict[key] + cl_centrality_dict[key] + bw_centrality_dict[key]
     sorted_centrality_dict = np.array( sorted(centrality_dict.items(), key = itemgetter(1)  ), dtype = str)
     topk = [i[0] for i in sorted_centrality_dict[-k:]]
     middle2k = [i[0] for i in sorted_centrality_dict[-3*k: -k]]
@@ -177,13 +186,11 @@ def getClusteredChoices(k, G, ratios, num_copies):
 
         if k - total  <=  2*partition:
             a = get_centrality_sum_randomized_multiple(k - total, ratios, num_copies, H)
-            for i in range(len(a)):
-                choices.append(a[i])
-
         else:
             a = get_centrality_sum_randomized_multiple(partition, ratios,  num_copies, H)
-            for i in range(len(a)):
-                choices.append(a[i])
+
+        for i in range(len(a)):
+            choices.append(a[i])
 
         total += partition
 
@@ -267,9 +274,10 @@ def print_out(choices, outfile_path):
 #print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.2.1.txt')
 # choices = repeat_same_strategy(35, 50, 'centrality')
 # choices = get_centrality_sum_randomized_multiple(10, [8, 2, 0], 1, G)
+start = time.clock()
 choices = getClusteredChoices(10, G, [8, 2, 0], 1)
-
-print choices
-# print_out(choices, './output1.txt')
+print "Time: " + str(time.clock() - start)
+# print choices
+print_out(choices, './output1.txt')
 #print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.2.2.txt')
 #print_out(choices, '/Users/abalakrishna/Downloads/submission2.10.32.1.txt')
