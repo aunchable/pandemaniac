@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # Load graph and convert to networkx graph #
 ############################################
 #with open('graphs/testgraph1.json') as data_file:
-with open('graphs/8.35.2.json') as data_file:
+with open('/Users/anshulramachandran/Downloads/8.40.2.json') as data_file:
 # with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -41,8 +41,8 @@ while len(G) > int(0.3*len(G_initial)):
         deg = G.degree()
         to_remove = [n for n in deg if deg[n] <= cut]
         G.remove_nodes_from(to_remove)
-        if len(G) < int(0.3*len(G_initial)):
-            break
+        # if len(G) < int(0.8*len(G_initial)):
+        #     break
     cut += 1
 print("Done pruning with {0} nodes left".format(len(G)))
 # Function so that given K, uses subgraphs and centrality to
@@ -178,10 +178,17 @@ def getClusteredChoices(k, G, ratios, num_copies):
     choices = []
     subgraphs = [c for c in nx.connected_components(G)]
 
+    subgraphs = [c for c in subgraphs if len(c) > 20]
+
     partition = int(k/len(subgraphs))
     total = 0
 
+    print [len(n) for n in subgraphs]
+
     for c in subgraphs:
+        if len(c) < 20:
+            continue
+
         H = G.subgraph(c)
 
         if k - total  <=  2*partition:
@@ -275,9 +282,9 @@ def print_out(choices, outfile_path):
 # choices = repeat_same_strategy(35, 50, 'centrality')
 # choices = get_centrality_sum_randomized_multiple(10, [8, 2, 0], 1, G)
 start = time.clock()
-choices = getClusteredChoices(10, G, [8, 2, 0], 1)
+choices = getClusteredChoices(40, G, [8, 16, 16], 50)
 print "Time: " + str(time.clock() - start)
 # print choices
-print_out(choices, './output1.txt')
-#print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.2.2.txt')
+# print_out(choices, './output1.txt')
+print_out(choices, '/Users/anshulramachandran/Downloads/submission8.40.2.2.txt')
 #print_out(choices, '/Users/abalakrishna/Downloads/submission2.10.32.1.txt')
