@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # Load graph and convert to networkx graph #
 ############################################
 #with open('graphs/testgraph1.json') as data_file:
-with open('/Users/anshulramachandran/Downloads/8.40.2.json') as data_file:
+with open('/Users/anshulramachandran/Downloads/2.10.13.json') as data_file:
 # with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -34,7 +34,7 @@ G = G_initial.copy()
 print len(G)
 cut = int(np.log(len(G)))
 print cut
-while len(G) > int(0.3*len(G_initial)):
+while len(G) > int(1.1*len(G_initial)):
     old_len = -1
     while len(G) != old_len:
         old_len = len(G)
@@ -110,6 +110,10 @@ print("Done pruning with {0} nodes left".format(len(G)))
 #nx.draw_networkx_nodes(G1, pos)
 #nx.draw_networkx_edges(G1, pos)
 #plt.show()
+
+def show_graph(G):
+    nx.draw(G)
+
 ####################
 # Strategy Section #
 ####################
@@ -282,9 +286,11 @@ def print_out(choices, outfile_path):
 # choices = repeat_same_strategy(35, 50, 'centrality')
 # choices = get_centrality_sum_randomized_multiple(10, [8, 2, 0], 1, G)
 start = time.clock()
-choices = getClusteredChoices(40, G, [8, 16, 16], 50)
-print "Time: " + str(time.clock() - start)
+
+show_graph(G)
+## choices = getClusteredChoices(40, G, [8, 16, 16], 50)
+## print "Time: " + str(time.clock() - start)
 # print choices
 # print_out(choices, './output1.txt')
-print_out(choices, '/Users/anshulramachandran/Downloads/submission8.40.2.2.txt')
+##print_out(choices, '/Users/anshulramachandran/Downloads/submission8.40.2.2.txt')
 #print_out(choices, '/Users/abalakrishna/Downloads/submission2.10.32.1.txt')
