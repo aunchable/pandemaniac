@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 ############################################
 # Load graph and convert to networkx graph #
 ############################################
-#with open('graphs/testgraph1.json') as data_file:
-with open('/Users/anshulramachandran/Downloads/2.10.13.json') as data_file:
+with open('graphs/2.10.30.json') as data_file:
+# with open('/Users/anshulramachandran/Downloads/2.10.13.json') as data_file:
 # with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -31,20 +31,20 @@ print len(G_initial)
 # PRUNE G_initial to get G
 
 G = G_initial.copy()
-print len(G)
-cut = int(np.log(len(G)))
-print cut
-while len(G) > int(1.1*len(G_initial)):
-    old_len = -1
-    while len(G) != old_len:
-        old_len = len(G)
-        deg = G.degree()
-        to_remove = [n for n in deg if deg[n] <= cut]
-        G.remove_nodes_from(to_remove)
-        # if len(G) < int(0.8*len(G_initial)):
-        #     break
-    cut += 1
-print("Done pruning with {0} nodes left".format(len(G)))
+# print len(G)
+# cut = int(np.log(len(G)))
+# print cut
+# while len(G) > int(1.1*len(G_initial)):
+#     old_len = -1
+#     while len(G) != old_len:
+#         old_len = len(G)
+#         deg = G.degree()
+#         to_remove = [n for n in deg if deg[n] <= cut]
+#         G.remove_nodes_from(to_remove)
+#         # if len(G) < int(0.8*len(G_initial)):
+#         #     break
+#     cut += 1
+# print("Done pruning with {0} nodes left".format(len(G)))
 # Function so that given K, uses subgraphs and centrality to
 # output choices
 
@@ -72,8 +72,8 @@ print("Done pruning with {0} nodes left".format(len(G)))
 # print subgraphs
 # # G=nx.dodecahedral_graph()
 # pos = nx.spring_layout(G)
-# #nx.draw(G)
-# #plt.show()
+# nx.draw(G)
+# plt.show()
 #
 # G1 = G.copy()
 # old_len = -1
@@ -112,7 +112,15 @@ print("Done pruning with {0} nodes left".format(len(G)))
 #plt.show()
 
 def show_graph(G):
-    nx.draw(G)
+    pos = nx.spring_layout(G)
+    nds =  map(int, ["215", "73", "99", "27", "1", "234", "37", "97", "91", "62", "9", "143"])
+    # print G.nodes()
+    vals = []
+    nx.draw_networkx_nodes(G, pos, nodelist=nds, node_color='b')
+    nx.draw_networkx_nodes(G, pos, nodelist=list(set(G.nodes()) - set(nds)), node_color='r')
+    nx.draw_networkx_edges(G, pos)
+    nx.draw_networkx_labels(G, pos)
+    plt.show()
 
 ####################
 # Strategy Section #
