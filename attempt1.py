@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 ############################################
 # Load graph and convert to networkx graph #
 ############################################
-with open('graphs/2.10.30.json') as data_file:
-# with open('/Users/anshulramachandran/Downloads/2.10.13.json') as data_file:
+# with open('graphs/2.10.30.json') as data_file:
+with open('/Users/anshulramachandran/Downloads/2.10.34.json') as data_file:
 # with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -295,10 +295,10 @@ def print_out(choices, outfile_path):
 # choices = get_centrality_sum_randomized_multiple(10, [8, 2, 0], 1, G)
 start = time.clock()
 
-show_graph(G)
-## choices = getClusteredChoices(40, G, [8, 16, 16], 50)
+#show_graph(G)
+choices = getClusteredChoices(10, G, [10, 0, 0], 50)
 ## print "Time: " + str(time.clock() - start)
 # print choices
 # print_out(choices, './output1.txt')
-##print_out(choices, '/Users/anshulramachandran/Downloads/submission8.40.2.2.txt')
+print_out(choices, '/Users/anshulramachandran/Downloads/submission2.10.34.1.txt')
 #print_out(choices, '/Users/abalakrishna/Downloads/submission2.10.32.1.txt')
