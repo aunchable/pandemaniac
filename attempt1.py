@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # Load graph and convert to networkx graph #
 ############################################
 # with open('graphs/2.10.30.json') as data_file:
-with open('/Users/anshulramachandran/Downloads/2.10.34.json') as data_file:
+with open('/Users/anshulramachandran/Downloads/6.20.1.json') as data_file:
 # with open('./testgraph1.json') as data_file:
     data = json.load(data_file)
 
@@ -31,20 +31,21 @@ print len(G_initial)
 # PRUNE G_initial to get G
 
 G = G_initial.copy()
-# print len(G)
-# cut = int(np.log(len(G)))
-# print cut
+print len(G)
+cut = int(np.log(len(G)))
+print cut
 # while len(G) > int(1.1*len(G_initial)):
-#     old_len = -1
-#     while len(G) != old_len:
-#         old_len = len(G)
-#         deg = G.degree()
-#         to_remove = [n for n in deg if deg[n] <= cut]
-#         G.remove_nodes_from(to_remove)
-#         # if len(G) < int(0.8*len(G_initial)):
-#         #     break
-#     cut += 1
-# print("Done pruning with {0} nodes left".format(len(G)))
+while len(G) > 2000:
+    old_len = -1
+    while len(G) != old_len:
+        old_len = len(G)
+        deg = G.degree()
+        to_remove = [n for n in deg if deg[n] <= cut]
+        G.remove_nodes_from(to_remove)
+        # if len(G) < int(0.8*len(G_initial)):
+        #     break
+    cut += 1
+print("Done pruning with {0} nodes left".format(len(G)))
 # Function so that given K, uses subgraphs and centrality to
 # output choices
 
@@ -160,7 +161,7 @@ def get_centrality_sum_randomized_multiple(k, distr, num_iters, G):
     print("Degree Time: " + str(time.clock() - start))
     cl_centrality_dict = nx.closeness_centrality(G)
     print("Closeness Time: " + str(time.clock() - start))
-    if len(G) < 2000:
+    if len(G) <= 2000:
         bw_centrality_dict = nx.betweenness_centrality(G)
         print("Betweenness Time: " + str(time.clock() - start))
 
@@ -296,9 +297,9 @@ def print_out(choices, outfile_path):
 start = time.clock()
 
 #show_graph(G)
-choices = getClusteredChoices(10, G, [10, 0, 0], 50)
+choices = getClusteredChoices(20, G, [9, 6, 5], 50)
 ## print "Time: " + str(time.clock() - start)
 # print choices
 # print_out(choices, './output1.txt')
-print_out(choices, '/Users/anshulramachandran/Downloads/submission2.10.34.1.txt')
+print_out(choices, '/Users/anshulramachandran/Downloads/submission6.20.1.2.txt')
 #print_out(choices, '/Users/abalakrishna/Downloads/submission2.10.32.1.txt')
