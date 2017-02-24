@@ -10,9 +10,7 @@ import matplotlib.pyplot as plt
 ############################################
 # Load graph and convert to networkx graph #
 ############################################
-# with open('graphs/2.10.30.json') as data_file:
-with open('/Users/anshulramachandran/Downloads/6.20.1.json') as data_file:
-# with open('./testgraph1.json') as data_file:
+with open('graphs/2.10.30.json') as data_file:
     data = json.load(data_file)
 
 num_nodes = len(data)
@@ -25,16 +23,14 @@ for i in range(num_nodes):
 
 G_initial = nx.from_numpy_matrix(adj)
 print len(G_initial)
-#plt.title("Original")
-#plt.show()
+plt.title("Original")
+plt.show()
 
 # PRUNE G_initial to get G
-
 G = G_initial.copy()
 print len(G)
 cut = int(np.log(len(G)))
 print cut
-# while len(G) > int(1.1*len(G_initial)):
 while len(G) > 2000:
     old_len = -1
     while len(G) != old_len:
@@ -42,36 +38,14 @@ while len(G) > 2000:
         deg = G.degree()
         to_remove = [n for n in deg if deg[n] <= cut]
         G.remove_nodes_from(to_remove)
-        # if len(G) < int(0.8*len(G_initial)):
-        #     break
     cut += 1
 print("Done pruning with {0} nodes left".format(len(G)))
-# Function so that given K, uses subgraphs and centrality to
-# output choices
 
-#for node in s:
-#    choices.append((node, adj[node]) )
 
-#print choices
-
-# choices = []
+# Failed Min Cut Pruning
 #
-# for i in range(len(choices)):
-#     choicesd
-
-#for i in range(len(choices))
-
-
-
-
-#for i in len(subgraphs):
-
-
-
-
-
 # print subgraphs
-# # G=nx.dodecahedral_graph()
+# G=nx.dodecahedral_graph()
 # pos = nx.spring_layout(G)
 # nx.draw(G)
 # plt.show()
@@ -84,12 +58,12 @@ print("Done pruning with {0} nodes left".format(len(G)))
 #     to_remove = [n for n in deg if deg[n] <= 10]
 #     G1.remove_nodes_from(to_remove)
 #     print old_len
-# #nx.draw_networkx_nodes(G1, pos)
-# #nx.draw_networkx_edges(G1, pos)
-# #plt.show()
+# nx.draw_networkx_nodes(G1, pos)
+# nx.draw_networkx_edges(G1, pos)
+# plt.show()
 #
 # bw_centrality_dict = nx.betweenness_centrality(G1)
-# # dg_centrality_dict = nx.degree_centrality(G1)
+# dg_centrality_dict = nx.degree_centrality(G1)
 # alpha =1
 # ranking = {}
 # for key in bw_centrality_dict.keys():
@@ -105,17 +79,16 @@ print("Done pruning with {0} nodes left".format(len(G)))
 #     deg = G1.degree()
 #     to_remove = [n for n in deg if deg[n] <= 1]
 #     G1.remove_nodes_from(to_remove)
-# # G1.remove_nodes_from(drop)
+# G1.remove_nodes_from(drop)
 # print drop
+# nx.draw_networkx_nodes(G1, pos)
+# nx.draw_networkx_edges(G1, pos)
+# plt.show()
 
-#nx.draw_networkx_nodes(G1, pos)
-#nx.draw_networkx_edges(G1, pos)
-#plt.show()
-
+# Graph visualization
 def show_graph(G):
     pos = nx.spring_layout(G)
     nds =  map(int, ["215", "73", "99", "27", "1", "234", "37", "97", "91", "62", "9", "143"])
-    # print G.nodes()
     vals = []
     nx.draw_networkx_nodes(G, pos, nodelist=nds, node_color='b')
     nx.draw_networkx_nodes(G, pos, nodelist=list(set(G.nodes()) - set(nds)), node_color='r')
@@ -282,24 +255,15 @@ def run_multiple_simulations(num_simulations, k, strat_name):
 
     return win_dict, avg_times
 
-# print run_multiple_simulations(50, 5, {'strat1': 'degree', 'strat2': 'cluster', 'strat3': 'katz_central', 'strat4': 'centrality'})
 
+# Print Out
 def print_out(choices, outfile_path):
     f = open(outfile_path, 'w')
     for iter_choices in choices:
         for node in iter_choices:
             f.write(str(node) + '\n')
 
-#choices = repeat_strategy(35, 50, 'random')
-#print_out(choices, '/Users/anshulramachandran/Downloads/submission8.35.2.1.txt')
-# choices = repeat_same_strategy(35, 50, 'centrality')
-# choices = get_centrality_sum_randomized_multiple(10, [8, 2, 0], 1, G)
-start = time.clock()
 
-#show_graph(G)
+start = time.clock()
 choices = getClusteredChoices(20, G, [9, 6, 5], 50)
-## print "Time: " + str(time.clock() - start)
-# print choices
-# print_out(choices, './output1.txt')
-print_out(choices, '/Users/anshulramachandran/Downloads/submission6.20.1.2.txt')
-#print_out(choices, '/Users/abalakrishna/Downloads/submission2.10.32.1.txt')
+print_out(choices, './submission2.10.30.1.txt')
